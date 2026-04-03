@@ -132,6 +132,8 @@ To allow the ESP32 to take full control, the stove must be configured as follows
 * **Standby Mode:** Must be set to **ON**.
 * **Internal Chrono:** Must be **DISABLED**.
 
+Check your stove manual to be sure these params are the valid for your stove.
+
 ### 3. Operational Behavior
 Once configured, the ESP32 dictates the stove's behavior via the relay:
 * **Relay Open (Stove OFF/Modulating):** The stove enters "Modulation" mode because the low target temperature (7°C) is reached. After the timeout set in the technical settings (typically **10 minutes**), the stove will perform its shutdown cycle.
