@@ -1,5 +1,5 @@
-# 🔥 CloeSmart: ESP32 Stove Controller for Micronova boards
-An intelligent, Telegram-based stove control system powered by ESP32 and FreeRTOS, written for Micronova boards (and all boards having a dry contact for an external Thermostat). 
+# 🔥 CloeSmart: ESP32 Stove Controller for MicroNova boards
+An intelligent, Telegram-based stove control system powered by ESP32 and FreeRTOS, written for MicroNova boards (and all boards having a dry contact for an external Thermostat). 
 It manages scheduled ignition (Crono), power modulation, and a "kickstart" safety system to prevent accidental shutdowns during maintenance phases.
 
 ## 🚀 Key Features
