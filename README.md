@@ -132,7 +132,7 @@ To allow the ESP32 to take full control, the stove must be configured as follows
 * **Standby Mode:** Must be set to **ON**.
 * **Internal Chrono:** Must be **DISABLED**.
 
-Check your stove manual to be sure these params are the valid for your stove.
+Check your stove manual to be sure these params are valid for your stove.
 
 ### 3. Operational Behavior
 Once configured, the ESP32 dictates the stove's behavior via the relay:
