@@ -11,19 +11,10 @@
 // --- CONFIGURATION ---
 const int RELAY_PIN = 26;
 
-Preferences prefs;
-
 // Timing parameters (in milliseconds)
 uint32_t AUTO_OFF_DELAY = 10 * 60000;   // 10 minutes (to be verified in A9)
 uint32_t SAFETY_MARGIN = 2 * 60000;     // Intervention 2 mins before (8th minute)
 uint32_t KICKSTART_DURATION = 30000;    // 30 seconds of "Work" (Pulse)
-
-// --- Crono Variables ---
-
-String cronoOnTime = "07:00";
-String cronoOffTime = "22:00";
-bool isCronoEnabled = true;
-Timezone tz;
 
 // --- STATIC NETWORK CONFIG ---
 IPAddress local_IP(192, 168, 1, 184);
@@ -32,6 +23,17 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
 
+// --- Crono Variables (overwritten by telegram command)---
+String cronoOnTime = "07:00";
+String cronoOffTime = "22:00";
+bool isCronoEnabled = true;
+Timezone tz;
+
+
+
+// --- END CONFIGURATION ---
+
+Preferences prefs;
 // Finite State Machine (FSM) States
 enum StoveState { STATE_OFF, STATE_WORK, STATE_MODULATING };
 StoveState currentStoveState = STATE_OFF;
@@ -295,11 +297,14 @@ void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  
   // Static IP configuration
-  /*if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
+  /*
+  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
     Serial.println("STA Failed to configure");
-  }*/
+  }
+  */
 
 
   securedClient.setInsecure();
