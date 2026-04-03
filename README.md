@@ -1,0 +1,1 @@
+Copy include/secrets.h.example, name it secrets.h and edit your params.
