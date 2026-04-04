@@ -18,7 +18,6 @@ const IPAddress SECONDARY_DNS (  8,   8,   4,   4);
 
 // --- DEBUG ---
 #define CLOE_DEBUG  1
-
 #if CLOE_DEBUG 
   #define LOG(x) Serial.println(x)
 #else

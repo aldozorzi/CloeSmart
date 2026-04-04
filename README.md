@@ -15,59 +15,15 @@ It manages scheduled ignition (Crono), power modulation, and a "kickstart" safet
 
 ### 1. Secret Management
 The project uses a `secrets.h` file for sensitive credentials.
-1. Locate `src/secrets.h.example`.
-2. **Duplicate it** and rename it to `src/secrets.h`.
+1. Locate `include/secrets.h.example`.
+2. **Duplicate it** and rename it to `include/secrets.h`.
 3. Fill in your WiFi credentials and your Telegram Bot Token.
 
 ### 2. Localization
-The system supports multi-language support via `localization.h`. Below is the English template:
+The system supports multi-language support via `include/localization.h`. 
 
-```cpp
-#ifndef LOCALIZATION_H
-#define LOCALIZATION_H
-
-// --- System Messages ---
-#define MSG_SYSTEM_ONLINE    "🤖 **Cloe System Online**\nController rebooted successfully.\nThe stove is OFF ❄️"
-
-// --- Commands and Status ---
-#define CMD_ON               "/on"
-#define CMD_OFF              "/off"
-#define CMD_STATUS           "/status"
-
-// --- Bot Responses ---
-#define RESP_STOVE_ON        "🔥 Command sent: The stove is turning ON"
-#define RESP_STOVE_OFF       "❄️ Command sent: The stove is turning OFF"
-#define RESP_STATUS_HEADER   "The stove is "
-#define ST_LABEL_OFF         "off ❄️"
-#define ST_LABEL_WORK        "on (Work) 🔥"
-#define ST_LABEL_MOD         "on (Modulating) 📉"
-
-#define MSG_UNAUTHORIZED     "⚠️ Access denied. You are not on the authorized list.\nYour ID: "
-#define MSG_REQ_SENT         "Authorization request sent to the owner 📨"
-#define MSG_WAIT_ADMIN       "Please wait for the owner to approve your request."
-
-#define ADMIN_NOTIF_REQ      "🔔 *New access request*\nUser: "
-#define ADMIN_NOTIF_ID       "\nID: "
-#define ADMIN_BTN_AUTH       "Authorize ✅"
-#define ADMIN_AUTH_SUCCESS   "User successfully authorized and saved to memory! 💾"
-
-#define USER_GRANTED         "🎉 Great news! The owner has accepted your request. You can now use the /menu command"
-
-// CRONO
-#define TIMEZONE                    "Europe/Rome"
-#define MSG_CHRONO_STATUS           "📅 *Chrono Status*\n"
-#define MSG_CHRONO_ON               "Chrono: ACTIVE ✅"
-#define MSG_CHRONO_OFF              "Chrono: DISABLED ❌"
-#define MSG_CHRONO_SETTINGS         "\nSchedules: "
-#define RESP_CHRONO_UPDATED         "✅ Schedule updated successfully!"
-#define RESP_CHRONO_INVALID         "⚠️ Invalid format! Use %CMD% HH:MM (e.g., %CMD% 07:30)"
-#define RESP_CHRONO_INVALID_SAME    "⚠️ Start time and end time cannot be the same"
-#define RESP_CHRONO_HELP            "🕒 Use: `%CMD% HH:MM` (e.g.: `%CMD% 07:00` - click to copy)"
-
-#endif
-```
 ### 3. Firmware Configuration
-Before flashing the ESP32, you **must** review the `// --- CONFIGURATION ---` section in `main.cpp`. These parameters act as the core logic of the system and should be adjusted to match your specific hardware and stove model:
+Before flashing the ESP32, you **must** review the `include/config.h`. These parameters act as the core logic of the system and should be adjusted to match your specific hardware and stove model:
 
 * **RELAY_PIN**: Default is `26`. Ensure this matches the physical GPIO connected to your relay module.
 * **AUTO_OFF_DELAY**: Default is `10 * 60000` (10 minutes). This is the "Modulation" timeout of your stove. **Verify this value on your stove's technical menu** (often called "Standby Delay" or "Mantenimento") and adjust accordingly.
