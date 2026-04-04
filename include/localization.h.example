@@ -17,6 +17,7 @@
 #define ST_LABEL_OFF         "off ❄️"
 #define ST_LABEL_WORK        "on (Work) 🔥"
 #define ST_LABEL_MOD         "on (Modulating) 📉"
+#define ST_LABEL_KICK        "on (Kickstart) 📉"
 
 #define MSG_UNAUTHORIZED     "⚠️ Access denied. You are not on the authorized list.\nYour ID: "
 #define MSG_REQ_SENT         "Authorization request sent to the owner 📨"
