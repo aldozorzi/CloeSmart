@@ -97,4 +97,4 @@ Once configured, the ESP32 dictates the stove's behavior via the relay:
 
 ------
 
-*Enjoy your smart heat!* 🪵
+*Enjoy your smart heat!* 🔥
