@@ -3,8 +3,8 @@ An intelligent, Telegram-based stove control system powered by ESP32 and FreeRTO
 It manages scheduled ignition (Crono), power modulation, and a "kickstart" safety system to prevent accidental shutdowns during maintenance phases.
 
 ## 🚀 Key Features
-* **FSM (Finite State Machine):** Robust state management including `STATE_OFF`, `STATE_WORK`, and `STATE_MODULATING`.
-* **Advanced Crono:** Weekly/Daily scheduling for power ON/OFF saved in non-volatile memory via ESP32 Preferences.
+* **FSM (Finite State Machine):** Robust state management including `STATE_OFF`, `STATE_WORK`, `STATE_MODULATING` and `KICKSTART`.
+* **Advanced Crono:** Daily scheduling for power ON/OFF saved in non-volatile memory via ESP32 Preferences.
 * **Anti-Cooldown Safety:** Automatic "Pulse" system during modulation to keep the stove active without overheating.
 * **Multi-Core Execution:** Asynchronous handling with Core 0 dedicated to Telegram/WiFi and Core 1 for physical relay control.
 * **Access Security:** Whitelist system with real-time authorization requests sent to the administrator.
