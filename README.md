@@ -86,6 +86,47 @@ The system acts as an Intermediary: **ESP32 -> Relay -> External Thermostat Port
 * Connect OneWire temp sensor to pin 4 (optional but if you don't, comment initThermometer() and taskThermometer in setup() in main.cpp)
 * Connect switcher to pin 1 (optional but if you don't, comment initSwitcher() in setup() in main.cpp)
 
+#### Component Connections
+
+##### 1.1 Relay Module (Stove Control)
+* **VCC (+):** RED wire → **5V** Pin
+* **GND (-):** BLACK wire → **G** Pin
+* **IN (Signal):** GREEN wire → **GPIO 2**
+
+##### 1.2 Temperature Probe (DS18B20)
+* **VCC:** RED wire → **3.3V** Pin
+* **GND:** BLACK wire → **G** Pin
+* **DATA:** YELLOW wire → **GPIO 4**
+* **Note:** A **5.1kΩ pull-up resistor** must be soldered between the **3.3V** pin and **GPIO 4**.
+
+##### 1.3 Capacitive Touch Sensor (TTP223)
+* **VCC:** RED wire → **5V** Pin (Shared with Relay)
+* **GND:** BLACK wire → **G** Pin (Shared with others)
+* **I/O (Signal):** [Chosen Color] wire → **GPIO 1**
+
+#### Pinout Summary Table (Right Side)
+
+Following the physical layout of the ESP32-C3 SuperMini (USB-C port at the top), use this sequence for soldering:
+
+| Physical Pin | Component / Wire | Action |
+| :--- | :--- | :--- |
+| **5V** | Relay VCC + Touch VCC | Solder both RED wires here |
+| **G (GND)** | Relay, Probe, and Touch GND | Twist all BLACK wires and solder here |
+| **3.3V** | Probe VCC + 5.1k Resistor leg | Probe RED wire + Resistor leg |
+| **4 (GPIO 4)** | Probe DATA + 5.1k Resistor leg | Probe YELLOW wire + Resistor leg |
+| **3 (GPIO 3)** | *EMPTY* | Reserved |
+| **2 (GPIO 2)** | Relay Signal | Stove trigger (Internal LED linked) |
+| **1 (GPIO 1)** | Touch Signal | Manual override switch |
+| **0 (GPIO 0)** | *EMPTY* | Reserved |
+
+#### Assembly Best Practices
+
+* **Common Rails:** Since the SuperMini has limited pins, twist the multiple GND (black) and 5V (red) wires together and "tin" them with solder before inserting them into the PCB holes.
+* **Resistor Placement:** To keep the build compact, solder the 5.1k resistor flat against the board between the 3.3V and GPIO 4 pins before attaching the probe wires.
+* **Mechanical Stability:** * Solder all wires directly to the board (avoid headers/pins) for better resistance to stove vibrations.
+    * After testing, apply a drop of **hot glue** over the solder joints to act as "strain relief."
+* **Enclosure:** Mount the components on a rigid plastic base (e.g., Polyethylene) using **VHB 5952F tape** or hot glue to ensure the USB-C port remains aligned with the enclosure opening.
+
 ### 2. Stove Configuration (Master/Slave Logic)
 To allow the ESP32 to take full control, the stove must be configured as follows:
 * **Target Temperature:** Set to the minimum (e.g., **7°C**).
