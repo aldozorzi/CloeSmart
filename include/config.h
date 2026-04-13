@@ -1,7 +1,9 @@
 #pragma once
 
 // --- PIN ---
-const int RELAY_PIN = 26;
+const int RELAY_PIN       = 2;   // relay control pin
+const int TEMP_PIN        = 4;   // sensor pin
+const int SWITCHER_PIN    = 1;   // switcher pin
 
 // --- TIMING (milliseconds) ---
 const uint32_t AUTO_OFF_DELAY      = 10 * 60000;  // 10 minutes
@@ -15,6 +17,11 @@ const IPAddress GATEWAY       (192, 168,   1,   1);
 const IPAddress SUBNET        (255, 255, 255,   0);
 const IPAddress PRIMARY_DNS   (  8,   8,   8,   8);
 const IPAddress SECONDARY_DNS (  8,   8,   4,   4);
+
+// thermometer
+const float DEFAULT_TARGET_TEMP = 21.0f;  // °C
+const float TEMP_HYSTERESIS     =  1.0f;  // margin to avid oscillations
+const int   TEMP_READ_INTERVAL  = 5000;   // reading every X milliseconds
 
 // --- DEBUG ---
 #define CLOE_DEBUG  1

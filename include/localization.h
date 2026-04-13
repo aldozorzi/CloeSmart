@@ -18,6 +18,7 @@
 #define ST_LABEL_WORK        "accesa (Lavoro) 🔥"
 #define ST_LABEL_MOD         "accesa (Modulazione) 📉"
 #define ST_LABEL_KICK        "accesa (Kickstart) 📉"
+#define ST_THERMO            "🌡 Temp: %TMP%°C / Target: %TGT%°C"
 
 #define MSG_UNAUTHORIZED     "⚠️ Accesso negato. Non sei nella lista utenti.\nIl tuo ID: "
 #define MSG_REQ_SENT         "Richiesta di autorizzazione inviata al proprietario 📨"

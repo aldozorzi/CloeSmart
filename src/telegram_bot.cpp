@@ -6,8 +6,10 @@
 #include "config.h"
 #include "secrets.h"
 #include "localization.h"
+#include "thermometer.h"
 #include <WiFi.h>
 #include <Preferences.h>
+
 
 // --- Definizione variabili (dichiarate extern in telegram_bot.h) ---
 WiFiClientSecure securedClient;
@@ -72,7 +74,13 @@ void taskTelegram(void *pvParameters) {
                                  (currentStoveState == STATE_WORK)      ? ST_LABEL_WORK :
                                  (currentStoveState == STATE_KICKSTART) ? ST_LABEL_KICK :
                                                                           ST_LABEL_MOD;
+                                                                          
+            
             String msg  = RESP_STATUS_HEADER + statusLabel + "\n";
+            msg += ST_THERMO;
+            msg.replace("%TMP%", String(currentTemperature));
+            msg.replace("%TGT%", String(targetTemperature));
+            msg += "\n";
             msg += (isCronoEnabled ? MSG_CHRONO_ON : MSG_CHRONO_OFF);
             msg += MSG_CHRONO_SETTINGS + cronoOnTime + " - " + cronoOffTime + "\n";
             msg += "🕒 Ora sistema: " + getCurrentTime();
