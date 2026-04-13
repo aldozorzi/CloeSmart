@@ -78,9 +78,11 @@ Do not use third-party "ID bots". Use the official Telegram API via your browser
 
 ### 1. Connection Schema
 The system acts as an Intermediary: **ESP32 -> Relay -> External Thermostat Port**.
-* Connect **ESP32 PIN 26** to the Relay module signal input.
+* Connect **ESP32 PIN 2** to the Relay module signal input.
 * Connect **ESP32 GND** to the Relay module ground (GND) to ensure a common reference.
 * Connect the Relay's **Normally Open (NO)** and **Common (COM)** terminals to the stove's external thermostat input (dry contact).
+* Connect OneWire temp sensor to pin 4 (optional but if you don't, comment initThermometer() and taskThermometer in setup() in main.cpp)
+* Connect switcher to pin 1 (optional but if you don't, comment initSwitcher() in setup() in main.cpp)
 
 ### 2. Stove Configuration (Master/Slave Logic)
 To allow the ESP32 to take full control, the stove must be configured as follows:
