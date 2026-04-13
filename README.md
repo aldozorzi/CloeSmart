@@ -25,7 +25,9 @@ The system supports multi-language support via `include/localization.h`.
 ### 3. Firmware Configuration
 Before flashing the ESP32, you **must** review the `include/config.h`. These parameters act as the core logic of the system and should be adjusted to match your specific hardware and stove model:
 
-* **RELAY_PIN**: Default is `26`. Ensure this matches the physical GPIO connected to your relay module.
+* **RELAY_PIN**: Default is `2`. Ensure this matches the physical GPIO connected to your relay module.
+* **TEMP_PIN**: Default is `4`. Ensure this matches the physical GPIO connected to your temp sensor.
+* **SWITCHER_PIN**: Default is `1`. Ensure this matches the physical GPIO connected to your physical switcher.
 * **AUTO_OFF_DELAY**: Default is `10 * 60000` (10 minutes). This is the "Modulation" timeout of your stove. **Verify this value on your stove's technical menu** (often called "Standby Delay" or "Mantenimento") and adjust accordingly.
 * **KICKSTART_DURATION**: Default is `30000` (30 seconds). This defines how long the relay closes to "wake up" the stove and reset its internal shutdown timer.
 * **Network Parameters**: If you are using a Static IP, verify the `local_IP`, `gateway`, and `subnet` to ensure they are compatible with your home router's range. If you want to use these parameters, go to setup() and uncomment
