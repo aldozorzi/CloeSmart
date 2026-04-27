@@ -49,11 +49,13 @@ Otherwise, the controller will connect in DHCP mode.
 3. Use `/setcommands` to configure the quick menu:
    * `on - Turn on the stove`
    * `off - Turn off the stove`
+   * `status - Check status and timers`
+   * `set_temp - Set target temperature`
    * `crono_on - Activate hourly schedule`
    * `crono_off - Deactivate hourly schedule`
    * `set_on - Set ON time`
    * `set_off - Set OFF time`
-   * `status - Check status and timers`
+   
 
 ### Retrieve your Chat ID (Secure Method)
 Do not use third-party "ID bots". Use the official Telegram API via your browser:
