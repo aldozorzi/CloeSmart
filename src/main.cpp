@@ -6,6 +6,7 @@
 #include "stove_fsm.h"
 #include "telegram_bot.h"
 #include "thermometer.h"
+#include "button.h"
 
 void setup() {
   Serial.begin(115200);
@@ -27,11 +28,15 @@ void setup() {
   loadCronoSettings();
   initThermometer();
 
+  initButton();
+
+
   bot.sendMessage(CHAT_ID_VAL, MSG_SYSTEM_ONLINE, "Markdown");
 
   xTaskCreatePinnedToCore(taskStoveControl, "StoveControl", 4096, NULL, 3, NULL, 1);
   xTaskCreatePinnedToCore(taskTelegram,     "TelegramBot",  8192, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(taskThermometer, "Thermometer", 2048, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(taskButton, "Button", 2048, NULL, 2, NULL, 1);
 
 
   LOG("FreeRTOS System Started.");

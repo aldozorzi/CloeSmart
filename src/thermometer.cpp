@@ -6,14 +6,12 @@
 #include <DallasTemperature.h>
 #include <Preferences.h>
 
-// --- Definizione variabili (dichiarate extern in thermometer.h) ---
 volatile float currentTemperature = 18.0f;
 float targetTemperature = DEFAULT_TARGET_TEMP;
 
 OneWire oneWire(TEMP_PIN);
 DallasTemperature sensors(&oneWire);
 
-// --- Persistenza ---
 void loadTargetTemp() {
     Preferences prefs;
     prefs.begin("thermo", true);
@@ -44,14 +42,10 @@ float readTemperature() {
     return t;
 }
 
-// --- TASK 3: TEMPERATURE MANAGEMENT ---
 void taskThermometer(void *pvParameters) {
     for (;;) {
         currentTemperature = readTemperature();
 
-        // Isteresi: evita oscillazioni continue attorno al setpoint
-        // isTargetReached va a true quando supera target + isteresi
-        // torna false solo quando scende sotto target - isteresi
         if (!isTargetReached && currentTemperature >= targetTemperature + TEMP_HYSTERESIS) {
             isTargetReached = true;
             LOG("Temperatura target raggiunta: " + String(currentTemperature) + "°C");

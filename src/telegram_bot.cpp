@@ -10,12 +10,9 @@
 #include <WiFi.h>
 #include <Preferences.h>
 
-
-// --- Definizione variabili (dichiarate extern in telegram_bot.h) ---
 WiFiClientSecure securedClient;
 UniversalTelegramBot bot(BOT_TOKEN, securedClient);
 
-// --- Autorizzazione utenti ---
 bool isUserAuthorized(String chat_id) {
     if (chat_id == CHAT_ID_VAL) return true;
     Preferences prefs;
@@ -25,7 +22,6 @@ bool isUserAuthorized(String chat_id) {
     return authorized;
 }
 
-// --- TASK 2: TELEGRAM AND WIFI (CORE 0) ---
 void taskTelegram(void *pvParameters) {
   for (;;) {
     if (WiFi.status() == WL_CONNECTED) {
@@ -36,7 +32,6 @@ void taskTelegram(void *pvParameters) {
           String text      = bot.messages[i].text;
           String from_name = bot.messages[i].from_name;
 
-          // --- 1. GESTIONE CALLBACK (Pulsante Autorizza) ---
           if (bot.messages[i].type == "callback_query") {
             if (chat_id == CHAT_ID_VAL && text.startsWith("AUTH_")) {
               String newUserId = text.substring(5);
@@ -50,7 +45,6 @@ void taskTelegram(void *pvParameters) {
             continue;
           }
 
-          // --- 2. FILTRO SICUREZZA ---
           if (!isUserAuthorized(chat_id)) {
             bot.sendMessage(chat_id, String(MSG_UNAUTHORIZED) + chat_id, "");
             bot.sendMessage(chat_id, MSG_REQ_SENT, "");
@@ -60,7 +54,6 @@ void taskTelegram(void *pvParameters) {
             continue;
           }
 
-          // --- 3. COMANDI AUTORIZZATI ---
           if (text == CMD_ON) {
             isStoveEnabled = true;
             bot.sendMessage(chat_id, RESP_STOVE_ON, "");

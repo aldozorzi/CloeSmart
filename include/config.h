@@ -3,7 +3,9 @@
 // --- PIN ---
 const int RELAY_PIN       = 2;   // relay control pin
 const int TEMP_PIN        = 4;   // sensor pin
-const int SWITCHER_PIN    = 1;   // switcher pin
+const int  BUTTON_PIN          = 1; // button pin (GPIO1 is also TX, but we won't use Serial1)
+const int  BUTTON_HOLD_MS      = 2000;   // ms to trigger long press action
+const int  BUTTON_DEBOUNCE_MS  = 50;     // anti-bounce delay
 
 // --- TIMING (milliseconds) ---
 const uint32_t AUTO_OFF_DELAY      = 10 * 60000;  // 10 minutes

@@ -6,14 +6,13 @@
 #include "localization.h"
 
 
-// --- Definizione variabili (dichiarate extern in stove_fsm.h) ---
 volatile StoveState currentStoveState = STATE_OFF;
 volatile bool isStoveEnabled          = false;
 volatile bool isTargetReached         = false;
 unsigned long modulationStartTime     = 0;
 unsigned long kickstartStartTime      = 0;
 SemaphoreHandle_t stateMutex;
-Timezone tz; // definizione locale, non extern
+Timezone tz; 
 
 String getCurrentTime() {
     return tz.dateTime("H:i");

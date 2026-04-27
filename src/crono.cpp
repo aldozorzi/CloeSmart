@@ -1,7 +1,6 @@
 #include "crono.h"
 #include "config.h"
 
-// --- Definizione variabili (dichiarate extern in crono.h) ---
 String cronoOnTime  = "07:00";
 String cronoOffTime = "22:00";
 bool isCronoEnabled = true;
