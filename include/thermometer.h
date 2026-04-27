@@ -4,6 +4,8 @@
 extern volatile float currentTemperature;
 extern float targetTemperature;
 
-float readTemperature();   // sostituire con lettura reale quando disponibile
+float readTemperature();
+void loadTargetTemp();
+void saveTargetTemp();
 void taskThermometer(void *pvParameters);
 void initThermometer();

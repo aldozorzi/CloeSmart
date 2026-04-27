@@ -4,6 +4,7 @@
 #include "config.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Preferences.h>
 
 // --- Definizione variabili (dichiarate extern in thermometer.h) ---
 volatile float currentTemperature = 18.0f;
@@ -12,33 +13,28 @@ float targetTemperature = DEFAULT_TARGET_TEMP;
 OneWire oneWire(TEMP_PIN);
 DallasTemperature sensors(&oneWire);
 
+// --- Persistenza ---
+void loadTargetTemp() {
+    Preferences prefs;
+    prefs.begin("thermo", true);
+    targetTemperature = prefs.getFloat("target", DEFAULT_TARGET_TEMP);
+    prefs.end();
+    LOG("Setpoint caricato: " + String(targetTemperature) + "°C");
+}
+ 
+void saveTargetTemp() {
+    Preferences prefs;
+    prefs.begin("thermo", false);
+    prefs.putFloat("target", targetTemperature);
+    prefs.end();
+}
+
 void initThermometer() {
+    loadTargetTemp();
     sensors.begin();
 }
 
-// --- Lettura temperatura ---
-// ⚠️ MOCKUP: sostituire il corpo di questa funzione con la lettura reale
-// Esempi:
-//   DS18B20  → sensors.getTempCByIndex(0)
-//   DHT22    → dht.readTemperature()
-//   NTC      → conversione da analogRead(TEMP_PIN)
 float readTemperature() {
-    // Simula una temperatura che sale lentamente se la stufa è accesa
-    // e scende se è spenta — utile per testare le transizioni FSM
-    static float mockTemp = 18.0f;
-
-    if (isStoveEnabled && currentStoveState != STATE_OFF && currentStoveState != STATE_MODULATING) {
-        mockTemp += 0.2f;  // Stufa accesa: temperatura sale
-    } else {
-        mockTemp -= 0.1f;  // Stufa spenta o in modulazione: temperatura scende
-    }
-
-    // Clamp tra valori realistici
-    mockTemp = constrain(mockTemp, 10.0f, 35.0f);
-    return mockTemp;
-}
-
-/*float readTemperature() {
     sensors.requestTemperatures();
     float t = sensors.getTempCByIndex(0);
     if (t == DEVICE_DISCONNECTED_C) {
@@ -46,7 +42,7 @@ float readTemperature() {
         return currentTemperature; // mantieni l'ultimo valore valido
     }
     return t;
-}*/
+}
 
 // --- TASK 3: TEMPERATURE MANAGEMENT ---
 void taskThermometer(void *pvParameters) {

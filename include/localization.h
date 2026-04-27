@@ -19,6 +19,9 @@
 #define ST_LABEL_MOD         "accesa (Modulazione) 📉"
 #define ST_LABEL_KICK        "accesa (Kickstart) 📉"
 #define ST_THERMO            "🌡 Temp: %TMP%°C / Target: %TGT%°C"
+#define RESP_TEMP_UPDATED     "🌡 Setpoint aggiornato a "
+#define RESP_TEMP_INVALID     "⚠️ Temperatura non valida. Usa un valore tra 10° e 30°C"
+#define RESP_TEMP_HELP        "Usa: /set_temp XX.X (es. /set_temp 21.5)"
 
 #define MSG_UNAUTHORIZED     "⚠️ Accesso negato. Non sei nella lista utenti.\nIl tuo ID: "
 #define MSG_REQ_SENT         "Richiesta di autorizzazione inviata al proprietario 📨"

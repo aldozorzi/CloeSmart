@@ -78,8 +78,8 @@ void taskTelegram(void *pvParameters) {
             
             String msg  = RESP_STATUS_HEADER + statusLabel + "\n";
             msg += ST_THERMO;
-            msg.replace("%TMP%", String(currentTemperature));
-            msg.replace("%TGT%", String(targetTemperature));
+            msg.replace("%TMP%", String(currentTemperature,1));
+            msg.replace("%TGT%", String(targetTemperature,1));
             msg += "\n";
             msg += (isCronoEnabled ? MSG_CHRONO_ON : MSG_CHRONO_OFF);
             msg += MSG_CHRONO_SETTINGS + cronoOnTime + " - " + cronoOffTime + "\n";
@@ -149,6 +149,22 @@ void taskTelegram(void *pvParameters) {
                 bot.sendMessage(chat_id, errorMsg, "");
               }
             }
+          }
+          else if (text == "/set_temp") {
+              bot.sendMessage(chat_id, RESP_TEMP_HELP, "");
+          }
+          else if (text.startsWith("/set_temp ")) {
+              int spaceIndex = text.indexOf(' ');
+              String val = text.substring(spaceIndex + 1);
+              val.trim();
+              float newTemp = val.toFloat();
+              if (newTemp >= 10.0f && newTemp <= 30.0f) {
+                  targetTemperature = newTemp;
+                  saveTargetTemp();
+                  bot.sendMessage(chat_id, RESP_TEMP_UPDATED + String(newTemp, 1) + "°C", "");
+              } else {
+                  bot.sendMessage(chat_id, RESP_TEMP_INVALID, "");
+              }
           }
         }
         numNewMessages = bot.getUpdates(bot.last_message_received + 1);
