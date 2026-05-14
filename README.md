@@ -150,7 +150,7 @@ You can connect to the device's remote shell via Telnet on port 23:
 ```bash
 telnet 192.168.1.100 23
 ```
-Upon a successful connection, the server will display an interactive banner listing all available commands and system status options.
+Upon a successful connection, write /help or ? to get a list of all available commands and system status options.
 
 
 ------
