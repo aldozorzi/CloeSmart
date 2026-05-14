@@ -23,6 +23,7 @@ void initTime() {
 }
 
 void taskStoveControl(void *pvParameters) {
+  LOG("Stove control task started.");
   for (;;) {
 
     if (isCronoEnabled) {
@@ -48,6 +49,7 @@ void taskStoveControl(void *pvParameters) {
 
       case STATE_WORK:
         digitalWrite(RELAY_PIN, HIGH);
+        LOG("Relay On.");
         if (!isStoveEnabled) {
           currentStoveState = STATE_OFF;
         }
@@ -61,6 +63,7 @@ void taskStoveControl(void *pvParameters) {
 
       case STATE_MODULATING:
         digitalWrite(RELAY_PIN, LOW);
+        LOG("Relay Off.");
         if (!isStoveEnabled) {
           currentStoveState = STATE_OFF;
         }
@@ -80,11 +83,13 @@ void taskStoveControl(void *pvParameters) {
 
       case STATE_KICKSTART:
         digitalWrite(RELAY_PIN, HIGH);
+        LOG("Relay On.");
         if (!isStoveEnabled) {
           currentStoveState = STATE_OFF;
         }
         else if (millis() - kickstartStartTime >= KICKSTART_DURATION) {
           digitalWrite(RELAY_PIN, LOW);
+          LOG("Relay Off.");
           xSemaphoreTake(stateMutex, portMAX_DELAY);
           modulationStartTime = millis();
           xSemaphoreGive(stateMutex);

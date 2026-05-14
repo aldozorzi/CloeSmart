@@ -4,11 +4,14 @@
 #include "config.h"
 
 void initButton() {
+    Serial.flush();
     pinMode(BUTTON_PIN, INPUT);  
     LOG("Button initalized on pin " + String(BUTTON_PIN));
+    Serial.flush();
 }
 
 void taskButton(void *pvParameters) {
+    LOG("Button task started.");
     bool lastState        = LOW;  
     bool pressing         = false; 
     unsigned long pressStart = 0; 

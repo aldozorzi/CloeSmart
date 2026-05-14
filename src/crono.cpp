@@ -5,17 +5,24 @@ String cronoOnTime  = "07:00";
 String cronoOffTime = "22:00";
 bool isCronoEnabled = true;
 
-Preferences prefs;
+
 
 void loadCronoSettings() {
-    prefs.begin("crono", true);
-    cronoOnTime     = prefs.getString("on",      "07:00");
-    cronoOffTime    = prefs.getString("off",     "22:00");
-    isCronoEnabled  = prefs.getBool  ("enabled", true);
+    Preferences prefs;
+    if (!prefs.begin("crono", false)) {
+        cronoOnTime    = "07:00";
+        cronoOffTime   = "22:00";
+        isCronoEnabled = true;
+        return;
+    }
+    cronoOnTime    = prefs.isKey("on")      ? prefs.getString("on",      "07:00") : "07:00";
+    cronoOffTime   = prefs.isKey("off")     ? prefs.getString("off",     "22:00") : "22:00";
+    isCronoEnabled = prefs.isKey("enabled") ? prefs.getBool  ("enabled", true)    : true;
     prefs.end();
 }
 
 void saveCronoSettings() {
+    Preferences prefs;
     prefs.begin("crono", false);
     prefs.putString("on",      cronoOnTime);
     prefs.putString("off",     cronoOffTime);

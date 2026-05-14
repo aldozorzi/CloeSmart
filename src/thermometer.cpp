@@ -14,8 +14,13 @@ DallasTemperature sensors(&oneWire);
 
 void loadTargetTemp() {
     Preferences prefs;
-    prefs.begin("thermo", true);
-    targetTemperature = prefs.getFloat("target", DEFAULT_TARGET_TEMP);
+    if (!prefs.begin("thermo", false)) {
+        targetTemperature = DEFAULT_TARGET_TEMP;
+        return;
+    }
+    targetTemperature = prefs.isKey("target")
+                        ? prefs.getFloat("target", DEFAULT_TARGET_TEMP)
+                        : DEFAULT_TARGET_TEMP;
     prefs.end();
     LOG("Setpoint caricato: " + String(targetTemperature) + "°C");
 }
@@ -29,10 +34,20 @@ void saveTargetTemp() {
 
 void initThermometer() {
     loadTargetTemp();
+    Serial.flush();
+    LOG("Inizializzazione sensore temperatura...");
+    Serial.flush();
+
     sensors.begin();
+    Serial.flush();
+
+    int found = sensors.getDeviceCount();
+    LOG("Sensori trovati: " + String(found));
+    Serial.flush();
 }
 
 float readTemperature() {
+    return 15;
     sensors.requestTemperatures();
     float t = sensors.getTempCByIndex(0);
     if (t == DEVICE_DISCONNECTED_C) {
@@ -43,6 +58,7 @@ float readTemperature() {
 }
 
 void taskThermometer(void *pvParameters) {
+    LOG("Thermometer task started.");
     for (;;) {
         currentTemperature = readTemperature();
 

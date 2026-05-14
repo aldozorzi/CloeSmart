@@ -13,7 +13,7 @@
 // --- Risposte del Bot ---
 #define RESP_STOVE_ON        "🔥 Comando inviato: La stufa si sta accendendo"
 #define RESP_STOVE_OFF       "❄️ Comando inviato: La stufa si sta spegnendo"
-#define RESP_STATUS_HEADER   "La stufa è  "
+#define RESP_STATUS_HEADER   "Stufa "
 #define ST_LABEL_OFF         "spenta ❄️"
 #define ST_LABEL_WORK        "accesa (Lavoro) 🔥"
 #define ST_LABEL_MOD         "accesa (Modulazione) 📉"

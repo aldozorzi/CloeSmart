@@ -1,6 +1,7 @@
 # 🔥 CloeSmart: ESP32 Stove Controller for MicroNova boards
 An intelligent, Telegram-based stove control system powered by ESP32 and FreeRTOS, written for MicroNova boards (and all boards having a dry contact for an external Thermostat). 
 It manages scheduled ignition (Crono), power modulation, and a "kickstart" safety system to prevent accidental shutdowns during maintenance phases.
+It can be managed by Telegram app and Telnet connection.
 
 ## 🚀 Key Features
 * **FSM (Finite State Machine):** Robust state management including `STATE_OFF`, `STATE_WORK`, `STATE_MODULATING` and `KICKSTART`.
@@ -141,6 +142,16 @@ Check your stove manual to be sure these params are valid for your stove.
 Once configured, the ESP32 dictates the stove's behavior via the relay:
 * **Relay Open (Stove OFF/Modulating):** The stove enters "Modulation" mode because the low target temperature (7°C) is reached. After the timeout set in the technical settings (typically **10 minutes**), the stove will perform its shutdown cycle.
 * **Relay Closed (Stove ON/Work):** The ESP32 overrides the internal thermostat, forcing the stove into "Work" mode. From this moment, the ESP32 logic (including the Anti-Shutdown Pulse) manages the state.
+
+## 💻 Telnet Interface
+
+You can connect to the device's remote shell via Telnet on port 23:
+
+```bash
+telnet 192.168.1.100 23
+```
+Upon a successful connection, the server will display an interactive banner listing all available commands and system status options.
+
 
 ------
 

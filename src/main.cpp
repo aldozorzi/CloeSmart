@@ -5,6 +5,7 @@
 #include "crono.h"
 #include "stove_fsm.h"
 #include "telegram_bot.h"
+#include "telnet_server.h" 
 #include "thermometer.h"
 #include "button.h"
 
@@ -23,11 +24,16 @@ void setup() {
     Serial.print(".");
   }
 
+  LOG("\nIP locale: " + WiFi.localIP().toString());
+
   initTime();
   LOG("Current time: " + getCurrentTime());
   loadCronoSettings();
+  LOG("Crono settings loaded.");
   initThermometer();
-
+  Serial.flush();
+  LOG("Thermometer initialized.");
+  Serial.flush();
   initButton();
 
 
@@ -35,8 +41,9 @@ void setup() {
 
   xTaskCreatePinnedToCore(taskStoveControl, "StoveControl", 4096, NULL, 3, NULL, 1);
   xTaskCreatePinnedToCore(taskTelegram,     "TelegramBot",  8192, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(taskThermometer, "Thermometer", 2048, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(taskButton, "Button", 2048, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(taskThermometer,  "Thermometer",  4096, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(taskButton,       "Button",       2048, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(taskTelnet,       "TelnetServer", 4096, NULL, 2, NULL, 0);
 
 
   LOG("FreeRTOS System Started.");
