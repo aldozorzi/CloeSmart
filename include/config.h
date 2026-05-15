@@ -20,6 +20,10 @@ const IPAddress SUBNET        (255, 255, 255,   0);
 const IPAddress PRIMARY_DNS   (  8,   8,   8,   8);
 const IPAddress SECONDARY_DNS (  8,   8,   4,   4);
 
+// PORTS
+const int TELNET_PORT = 23;
+const int APP_TCP_PORT = 4242;
+
 // thermometer
 const float DEFAULT_TARGET_TEMP = 21.0f;  // °C
 const float TEMP_HYSTERESIS     =  1.0f;  // margin to avid oscillations

@@ -6,7 +6,7 @@
 #include "localization.h"
 
 static const size_t INPUT_BUF_MAX = 128;
-static WiFiServer telnetServer(23);
+static WiFiServer telnetServer(TELNET_PORT);
 static WiFiClient client;
 static String inputBuf;
 
@@ -30,7 +30,7 @@ static void sendBanner() {
 void taskTelnet(void *pvParameters) {
     telnetServer.begin();
     telnetServer.setNoDelay(true);
-    LOG("Native Telnet server started on port 23");
+    LOG("Native Telnet server started on port " + String(TELNET_PORT));
     inputBuf.reserve(INPUT_BUF_MAX);
 
     for (;;) {

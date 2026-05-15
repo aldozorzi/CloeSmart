@@ -4,12 +4,12 @@
 #include "config.h"
 
 // Usiamo la porta 4242 o quella che hai impostato nel metodo C#
-static WiFiServer appServer(4242); 
+static WiFiServer appServer(APP_TCP_PORT); 
 
 void taskTCPServer(void *pvParameters) {
     appServer.begin();
     appServer.setNoDelay(true); 
-    LOG("App TCP Server started on port 4242");
+    LOG("App TCP Server started on port " + String(APP_TCP_PORT));
 
     for (;;) {
         WiFiClient client = appServer.available();
