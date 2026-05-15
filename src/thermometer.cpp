@@ -47,7 +47,10 @@ void initThermometer() {
 }
 
 float readTemperature() {
-    return 15;
+    bool found = sensors.getDeviceCount() > 0;
+    if (!found) {
+        return 15;
+    }
     sensors.requestTemperatures();
     float t = sensors.getTempCByIndex(0);
     if (t == DEVICE_DISCONNECTED_C) {

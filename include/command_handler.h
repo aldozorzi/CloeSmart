@@ -5,3 +5,4 @@
 // Processes a command string (same syntax used by Telegram)
 // and returns the response string to send back to the caller.
 String processCommand(const String& text);
+String cleanResponse(String text);

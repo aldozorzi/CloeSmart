@@ -14,42 +14,6 @@ static String inputBuf;
 static bool sessionActive = false;
 static bool skipLF = false;
 
-String cleanResponse(String text) {
-    String cleaned = "";
-    cleaned.reserve(text.length());
-    
-    text.replace("à", "a");
-    text.replace("è", "e");
-    text.replace("é", "e");
-    text.replace("ì", "i");
-    text.replace("ò", "o");
-    text.replace("ù", "u");
-
-    bool isAtStartOfLine = true;
-    for (unsigned int i = 0; i < text.length(); i++) {
-        char c = text[i];
-        if (c == '\n') {
-            if (cleaned.length() == 0 || cleaned[cleaned.length() - 1] != '\r') {
-                cleaned += '\r';
-            }
-            cleaned += '\n';
-            isAtStartOfLine = true;
-            continue;
-        }
-        if (c == '\r') {
-            cleaned += '\r';
-            continue;
-        }
-        if ((uint8_t)c < 32 || (uint8_t)c > 126) continue;
-        if (isAtStartOfLine) {
-            if (c == ' ' || c == '\t') continue;
-            else isAtStartOfLine = false;
-        }
-        cleaned += c;
-    }
-    return cleaned;
-}
-
 static void sendBanner() {
     client.println("+----------------------------------+");
     client.println("|       CLOE - Telnet Shell        |");

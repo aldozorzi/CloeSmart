@@ -5,6 +5,7 @@
 #include "crono.h"
 #include "stove_fsm.h"
 #include "telegram_bot.h"
+#include "tcp_app_server.h"
 #include "telnet_server.h" 
 #include "thermometer.h"
 #include "button.h"
@@ -44,7 +45,7 @@ void setup() {
   xTaskCreatePinnedToCore(taskThermometer,  "Thermometer",  4096, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(taskButton,       "Button",       2048, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(taskTelnet,       "TelnetServer", 4096, NULL, 2, NULL, 0);
-
+  xTaskCreatePinnedToCore(taskTCPServer,    "AppTCPServer", 4096, NULL, 2, NULL, 0);
   bot.sendMessage(CHAT_ID_VAL, MSG_SYSTEM_ONLINE, "Markdown");
 
   LOG("FreeRTOS System Started.");
