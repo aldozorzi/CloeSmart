@@ -12,7 +12,8 @@ extern unsigned long modulationStartTime;
 extern unsigned long kickstartStartTime;
 extern SemaphoreHandle_t stateMutex;
 
-String getCurrentTime(); // restituisce tz.dateTime("H:i")
+String getCurrentTime(); // restituisce tz.dateTime("H:i") in ora locale Europe/Rome
 void initTime();
+void refreshTimezone(); // riapplica la timezone dopo riconnessione WiFi, con fallback POSIX
 
 void taskStoveControl(void *pvParameters);

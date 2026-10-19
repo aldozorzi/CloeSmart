@@ -12,19 +12,44 @@ volatile bool isTargetReached         = false;
 unsigned long modulationStartTime     = 0;
 unsigned long kickstartStartTime      = 0;
 SemaphoreHandle_t stateMutex;
-Timezone tz; 
+Timezone tz;
+
+// Regola POSIX per Europe/Rome: CET (UTC+1) + DST CEST.
+// Funziona offline, senza dipendere dal server timezoned.rop.nl di ezTime.
+// Formato POSIX: STDoffsetDST,regola-inizio,regola-fine
+// CET-1 = CET e' 1h a est di UTC; CEST da ultima dom di marzo a ultima dom di ottobre, ore 03:00.
+static const char* ROME_POSIX = "CET-1CEST,M3.5.0,M10.5.0/3";
 
 String getCurrentTime() {
     return tz.dateTime("H:i");
 }
+
+void refreshTimezone() {
+    // Prova la lookup dinamica, ma se fallisce (timeout/rete/server giu')
+    // mantieni il fallback POSIX invece di restare su UTC.
+    if (!tz.setLocation(TIMEZONE)) {
+        LOG("Timezone lookup fallita, uso fallback POSIX Europe/Rome");
+        tz.setPosix(ROME_POSIX);
+    }
+    LOG("Timezone: " + tz.getOlson() + " " + tz.getPosix());
+}
+
 void initTime() {
+    // 1. Fallback offline SUBITO: anche se la lookup fallisce, l'ora e' corretta.
+    tz.setPosix(ROME_POSIX);
+    // 2. Sincronizza NTP (blocca finche' l'ora UTC e' valida).
     waitForSync();
-    tz.setLocation(TIMEZONE);
+    // 3. Prova la lookup dinamica (per coerenza con TIMEZONE), con fallback.
+    refreshTimezone();
+    LOG("Ora locale: " + tz.dateTime("H:i") + " UTC: " + UTC.dateTime("H:i"));
 }
 
 void taskStoveControl(void *pvParameters) {
   LOG("Stove control task started.");
   for (;;) {
+    // Mantiene aggiornato NTP / ezTime. Senza questa chiamata l'orologio
+    // deriva e non si risincronizza mai (loop() principale e' sospeso).
+    events();
 
     if (isCronoEnabled) {
       String currentTime = tz.dateTime("H:i");

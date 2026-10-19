@@ -78,6 +78,7 @@ void taskTelegram(void *pvParameters) {
       if (WiFi.status() == WL_CONNECTED) {
         LOG("\nWiFi riconnesso.");
         waitForSync();
+        refreshTimezone();
       } else {
         LOG("\nRiconnessione fallita, riprovo al prossimo ciclo.");
       }
