@@ -9,6 +9,7 @@
 volatile StoveState currentStoveState = STATE_OFF;
 volatile bool isStoveEnabled          = false;
 volatile bool isTargetReached         = false;
+volatile bool isOtaInProgress         = false;
 unsigned long modulationStartTime     = 0;
 unsigned long kickstartStartTime      = 0;
 SemaphoreHandle_t stateMutex;
@@ -50,6 +51,16 @@ void taskStoveControl(void *pvParameters) {
     // Mantiene aggiornato NTP / ezTime. Senza questa chiamata l'orologio
     // deriva e non si risincronizza mai (loop() principale e' sospeso).
     events();
+
+    // During a firmware upload the relay must stay off and the schedule
+    // must not start the stove.
+    if (isOtaInProgress) {
+      isStoveEnabled    = false;
+      currentStoveState = STATE_OFF;
+      digitalWrite(RELAY_PIN, LOW);
+      vTaskDelay(pdMS_TO_TICKS(200));
+      continue;
+    }
 
     if (isCronoEnabled) {
       String currentTime = tz.dateTime("H:i");

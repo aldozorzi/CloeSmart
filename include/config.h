@@ -14,15 +14,21 @@ const uint32_t KICKSTART_DURATION  =      30000;  // 30 seconds pulse
 
 // --- STATIC NETWORK CONFIG ---
 #include <IPAddress.h>
+// Set to 1 to use the static configuration below, 0 for DHCP.
+#define USE_STATIC_IP 0
 const IPAddress LOCAL_IP      (192, 168,   1, 184);
 const IPAddress GATEWAY       (192, 168,   1,   1);
 const IPAddress SUBNET        (255, 255, 255,   0);
 const IPAddress PRIMARY_DNS   (  8,   8,   8,   8);
 const IPAddress SECONDARY_DNS (  8,   8,   4,   4);
 
-// PORTS
-const int TELNET_PORT = 23;
-const int APP_TCP_PORT = 4242;
+// --- WEB INTERFACE ---
+#define HOSTNAME      "cloesmart"
+#define WEB_PORT      80
+#define WEB_AUTH_USER "admin"
+
+// --- FIRMWARE ---
+#define FW_VERSION "1.0.0"
 
 // thermometer
 const float DEFAULT_TARGET_TEMP = 21.0f;  // °C

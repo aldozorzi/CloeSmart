@@ -8,6 +8,7 @@ enum StoveState { STATE_OFF, STATE_WORK, STATE_MODULATING, STATE_KICKSTART };
 extern volatile StoveState currentStoveState;
 extern volatile bool isStoveEnabled;
 extern volatile bool isTargetReached;
+extern volatile bool isOtaInProgress;
 extern unsigned long modulationStartTime;
 extern unsigned long kickstartStartTime;
 extern SemaphoreHandle_t stateMutex;

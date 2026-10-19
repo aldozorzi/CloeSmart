@@ -1,9 +1,10 @@
 // command_handler.cpp
 //
 // Single source of truth for all stove commands.
-// Called by both taskTelegram (telegram_bot.cpp) and taskTelnet (telnet_server.cpp).
+// Called by both taskTelegram (telegram_bot.cpp) and taskWebServer (web_server.cpp).
 //
 #include "command_handler.h"
+#include <WiFi.h>
 #include "stove_fsm.h"
 #include "crono.h"
 #include "thermometer.h"
@@ -74,7 +75,8 @@ String processCommand(const String& text) {
     msg += "\n";
     msg += (isCronoEnabled ? MSG_CHRONO_ON : MSG_CHRONO_OFF);
     msg += MSG_CHRONO_SETTINGS + cronoOnTime + " - " + cronoOffTime + "\n";
-    msg += "🕒 Ora sistema: " + getCurrentTime();
+    msg += "🕒 Ora sistema: " + getCurrentTime() + "\n";
+    msg += "FW: " + String(FW_VERSION) + "  IP: " + WiFi.localIP().toString();
     return msg;
   }
 

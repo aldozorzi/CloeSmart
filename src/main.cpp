@@ -5,8 +5,7 @@
 #include "crono.h"
 #include "stove_fsm.h"
 #include "telegram_bot.h"
-#include "tcp_app_server.h"
-#include "telnet_server.h" 
+#include "web_server.h"
 #include "thermometer.h"
 #include "button.h"
 
@@ -16,6 +15,17 @@ void setup() {
   digitalWrite(RELAY_PIN, LOW);
 
   stateMutex = xSemaphoreCreateMutex();
+
+  WiFi.mode(WIFI_STA);
+  WiFi.setHostname(HOSTNAME);
+
+#if USE_STATIC_IP
+  if (!WiFi.config(LOCAL_IP, GATEWAY, SUBNET, PRIMARY_DNS, SECONDARY_DNS)) {
+    LOG("Static IP configuration failed");
+  } else {
+    LOG("Using static IP");
+  }
+#endif
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   securedClient.setInsecure();
@@ -44,8 +54,7 @@ void setup() {
   xTaskCreatePinnedToCore(taskTelegram,     "TelegramBot",  8192, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(taskThermometer,  "Thermometer",  4096, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(taskButton,       "Button",       2048, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(taskTelnet,       "TelnetServer", 4096, NULL, 2, NULL, 0);
-  xTaskCreatePinnedToCore(taskTCPServer,    "AppTCPServer", 4096, NULL, 2, NULL, 0);
+  xTaskCreatePinnedToCore(taskWebServer,    "WebServer",    8192, NULL, 2, NULL, 0);
   bot.sendMessage(CHAT_ID_VAL, MSG_SYSTEM_ONLINE, "Markdown");
 
   LOG("FreeRTOS System Started.");

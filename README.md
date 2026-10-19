@@ -1,14 +1,16 @@
 # 🔥 CloeSmart: ESP32 Stove Controller for MicroNova boards
 An intelligent, Telegram-based stove control system powered by ESP32 and FreeRTOS, written for MicroNova boards (and all boards having a dry contact for an external Thermostat). 
 It manages scheduled ignition (Crono), power modulation, and a "kickstart" safety system to prevent accidental shutdowns during maintenance phases.
-It can be managed by Telegram, Telnet connection, TCP packets.
+It can be managed remotely with Telegram and locally through a web interface served by the ESP32 itself, without any Internet connection.
 
 ## 🚀 Key Features
 * **FSM (Finite State Machine):** Robust state management including `STATE_OFF`, `STATE_WORK`, `STATE_MODULATING` and `KICKSTART`.
 * **Advanced Crono:** Daily scheduling for power ON/OFF saved in non-volatile memory via ESP32 Preferences.
 * **Anti-Cooldown Safety:** Automatic "Pulse" system during modulation to keep the stove active without overheating.
-* **Multi-Core Execution:** Asynchronous handling with Core 0 dedicated to Telegram/WiFi and Core 1 for physical relay control.
-* **Access Security:** Whitelist system with real-time authorization requests sent to the administrator.
+* **Local Web Interface:** A responsive web UI and HTTP API served directly by the ESP32. It works on the local network even when the Internet connection is down.
+* **Firmware Update over HTTP:** Upload a new `firmware.bin` from the web UI or with `curl`, without a USB cable. The update is manual and protected by the administrator password.
+* **Multi-Core Execution:** Asynchronous handling with Core 0 dedicated to Telegram, the web server and WiFi, and Core 1 for physical relay control.
+* **Access Security:** Telegram whitelist with real-time authorization requests; HTTP Basic authentication for the local web interface.
 
 ---
 
@@ -18,7 +20,8 @@ It can be managed by Telegram, Telnet connection, TCP packets.
 The project uses a `secrets.h` file for sensitive credentials.
 1. Locate `include/secrets.h.example`.
 2. **Duplicate it** and rename it to `include/secrets.h`.
-3. Fill in your WiFi credentials and your Telegram Bot Token.
+3. Fill in your WiFi credentials, your Telegram Bot Token and a strong `DEVICE_PASSWORD`.
+   `DEVICE_PASSWORD` protects the local web interface, its HTTP API and the firmware upload endpoint. If it is left empty, the web server does not start.
 
 ### 2. Localization
 The system supports multi-language support via `include/localization.h`. 
@@ -28,19 +31,14 @@ Before flashing the ESP32, you **must** review the `include/config.h`. These par
 
 * **RELAY_PIN**: Default is `2`. Ensure this matches the physical GPIO connected to your relay module.
 * **TEMP_PIN**: Default is `4`. Ensure this matches the physical GPIO connected to your temp sensor.
-* **SWITCHER_PIN**: Default is `1`. Ensure this matches the physical GPIO connected to your physical switcher.
+* **BUTTON_PIN**: Default is `5`. Ensure this matches the physical GPIO connected to your manual override button.
 * **AUTO_OFF_DELAY**: Default is `10 * 60000` (10 minutes). This is the "Modulation" timeout of your stove. **Verify this value on your stove's technical menu** (often called "Standby Delay" or "Mantenimento") and adjust accordingly.
 * **KICKSTART_DURATION**: Default is `30000` (30 seconds). This defines how long the relay closes to "wake up" the stove and reset its internal shutdown timer.
-* **Network Parameters**: If you are using a Static IP, verify the `local_IP`, `gateway`, and `subnet` to ensure they are compatible with your home router's range. If you want to use these parameters, go to setup() and uncomment
-
-```cpp
-/*
-if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-    Serial.println("STA Failed to configure");
-}
-*/
-```
-Otherwise, the controller will connect in DHCP mode.
+* **USE_STATIC_IP**: Default is `0` (DHCP). Set it to `1` to apply the static `LOCAL_IP`, `GATEWAY`, `SUBNET`, `PRIMARY_DNS` and `SECONDARY_DNS` already defined in `config.h`. The static configuration is optional: leave it at `0` if your router assigns addresses via DHCP.
+* **HOSTNAME**: Default is `"cloesmart"`. It is sent to the router as the DHCP hostname and used by mDNS as `cloesmart.local`.
+* **WEB_PORT**: Default is `80`. Port of the local web interface and HTTP API.
+* **WEB_AUTH_USER**: Default is `"admin"`. HTTP Basic authentication user.
+* **FW_VERSION**: Firmware version shown in `/stato`, in the web UI and in the API status response.
 
 ## 🤖 Bot Creation & Security
 
@@ -48,9 +46,9 @@ Otherwise, the controller will connect in DHCP mode.
 1. Search for **@BotFather** on Telegram.
 2. Send `/newbot` and follow the instructions to get your **API Token**.
 3. Use `/setcommands` to configure the quick menu:
-   * `on - Turn on the stove`
-   * `off - Turn off the stove`
-   * `status - Check status and timers`
+   * `accendi - Turn on the stove`
+   * `spegni - Turn off the stove`
+   * `stato - Check status and timers`
    * `set_temp - Set target temperature`
    * `crono_on - Activate hourly schedule`
    * `crono_off - Deactivate hourly schedule`
@@ -69,15 +67,111 @@ Do not use third-party "ID bots". Use the official Telegram API via your browser
 ---
 
 ## 🏗 Installation (PlatformIO)
-1. Clone or download this repository 
+1. Clone or download this repository.
 2. Ensure your `.gitignore` includes `.pio/` and `.vscode/`.
 3. Open the folder with VS Code + PlatformIO.
-4. The `platformio.ini` file will automatically handle dependencies:
+4. The `platformio.ini` file automatically handles the external dependencies:
    * `UniversalTelegramBot`
    * `ArduinoJson`
    * `ezTime`
+   * `OneWire` / `DallasTemperature`
+5. Build and flash the first time over USB:
+   ```bash
+   pio run -e esp32dev -t upload
+   ```
+   The `board_upload.before_reset = usb_reset` option is required by the ESP32-C3 USB-Serial/JTAG interface.
+6. Subsequent updates can be performed over the local network from the web interface, without a cable.
 
 ---
+
+## 🌐 Local Web Interface
+
+The ESP32 serves a web interface and an HTTP API on port `80` (configurable with `WEB_PORT`). No Internet connection is required: as long as the local network is working, the interface is reachable.
+
+* URL: `http://<device-ip>/`
+* mDNS alias: `http://cloesmart.local/` (supported by most desktop browsers; some Android devices may not resolve `.local`, so use the IP shown in `/stato`)
+* DHCP hostname: `cloesmart`
+
+The web interface is protected by HTTP Basic authentication:
+
+* User: `WEB_AUTH_USER` (`admin` by default)
+* Password: `DEVICE_PASSWORD` from `include/secrets.h`
+
+If `DEVICE_PASSWORD` is empty, the web server does not start (fail-closed) and an error is logged.
+
+> ⚠️ HTTP Basic authentication is sent in clear text. Use the interface only on your local network and never expose port 80 to the Internet. For remote access, use Telegram or a VPN.
+
+### Supported commands
+
+The web interface exposes exactly the same commands as Telegram:
+
+| Command | Description |
+| :--- | :--- |
+| `/accendi` | Turn the stove ON |
+| `/spegni` | Turn the stove OFF |
+| `/stato` | Show status, schedule, time, firmware version and IP |
+| `/crono_on` | Enable the daily schedule |
+| `/crono_off` | Disable the daily schedule |
+| `/set_on HH:MM` | Set the schedule ON time |
+| `/set_off HH:MM` | Set the schedule OFF time |
+| `/set_temp N` | Set the target temperature (10-30 °C) |
+
+All commands share the same implementation (`processCommand()`), so behaviour is identical across Telegram and HTTP.
+
+### HTTP API
+
+The API accepts the same command strings:
+
+```bash
+# Status as JSON
+curl -u admin:'YOUR_PASSWORD' http://cloesmart.local/api/status
+
+# Send a command (form encoded)
+curl -u admin:'YOUR_PASSWORD' -d "cmd=/accendi" http://cloesmart.local/api/command
+
+# Set the target temperature
+curl -u admin:'YOUR_PASSWORD' -d "cmd=/set_temp 21.5" http://cloesmart.local/api/command
+```
+
+`GET /api/status` returns JSON with English keys: `state`, `enabled`, `temperature_c`, `target_c`, `crono_enabled`, `crono_on`, `crono_off`, `time`, `uptime_s`, `version`, `ip`, `rssi`.
+
+`POST /api/command` accepts either a form field `cmd` or a JSON body such as `{"cmd":"/stato"}`. It returns:
+
+```json
+{"ok":true,"response":"..."}
+```
+
+---
+
+## ⬆️ Firmware Update over HTTP
+
+Firmware updates are **manual** and can be performed entirely over the local network, without a USB cable.
+
+1. Build the firmware:
+   ```bash
+   pio run -e esp32dev
+   ```
+2. Make sure the stove is **OFF**. The update endpoint refuses to start while the stove is enabled.
+3. Upload the application image (`.pio/build/esp32dev/firmware.bin`):
+
+   From the web interface: open the device page, choose `firmware.bin` in the **Firmware update** section and press **Upload and reboot**.
+
+   From a terminal:
+   ```bash
+   curl -u admin:'YOUR_PASSWORD' \
+        -F "update=@.pio/build/esp32dev/firmware.bin" \
+        http://cloesmart.local/update
+   ```
+
+4. The device verifies the image with `Update.end()`, responds `OK`, and reboots automatically.
+
+Notes:
+
+* Use `firmware.bin`, not the merged factory image.
+* The partition table contains two OTA application slots, so an interrupted upload does not destroy the running firmware.
+* During the upload the relay is forced OFF and the schedule is suspended.
+* There is no automatic rollback: if a newly flashed firmware cannot connect to WiFi, USB recovery is required.
+* Firmware upload is protected by the same HTTP Basic authentication as the rest of the interface; there is no separate OTA password.
 
 ## 🔌 Hardware Connection & Logic
 
@@ -143,26 +237,20 @@ Once configured, the ESP32 dictates the stove's behavior via the relay:
 * **Relay Open (Stove OFF/Modulating):** The stove enters "Modulation" mode because the low target temperature (7°C) is reached. After the timeout set in the technical settings (typically **10 minutes**), the stove will perform its shutdown cycle.
 * **Relay Closed (Stove ON/Work):** The ESP32 overrides the internal thermostat, forcing the stove into "Work" mode. From this moment, the ESP32 logic (including the Anti-Shutdown Pulse) manages the state.
 
-## 💻 Telnet Interface
+## 🧭 Network Behaviour and Fallbacks
 
-You can connect to the device's remote shell via Telnet on port 23 (configurable in `config.h`):
+* **Internet available:** Telegram works as the remote control.
+* **Internet down, local network up:** the web interface and HTTP API keep working; Telegram is unavailable until the WAN connection returns.
+* **Local network down:** the physical button remains the fallback. Hold it for `BUTTON_HOLD_MS` (2 seconds by default) to toggle the stove.
+* **Address stability:** DHCP is the default. For a stable address without a static IP, configure a DHCP reservation on your router. If you prefer a fixed address on the device, set `USE_STATIC_IP` to `1`.
 
-```bash
-telnet 192.168.1.100 23
-```
-Upon a successful connection, write /help or ? to get a list of all available commands and system status options.
+### mDNS and hostname
 
-## 🖥️ TCP Interface
+The device sets the DHCP hostname `cloesmart` and starts mDNS for `cloesmart.local`:
 
-You can control the device by sending a TCP packet to the ESP32 IP address using port **4242** (configurable in `config.h`). 
-
-### Usage
-* **Payload:** Send the desired command as a plain text string.
-* **Termination:** Ensure the command ends with a newline character (`\n`).
-
-### Mobile Client
-If you need a ready-to-use interface, you can use my Android app which allows you to set up custom buttons for these commands:
-👉 **[TCP-Messages on GitHub](https://github.com/aldozorzi/TCP-Messages)**
+* `http://cloesmart.local/` works on most desktop systems and iOS. Some Android browsers do not resolve `.local` addresses reliably.
+* `http://cloesmart/` (without `.local`) works only if your router registers DHCP client names in its local DNS.
+* `http://<device-ip>/` always works; the current IP is shown in the web interface and by `/stato`.
 
 ## 📄 License
 
