@@ -12,6 +12,7 @@
 
 #include "web_server.h"
 #include "config.h"
+#include "localization.h"
 #include "secrets.h"
 #include "command_handler.h"
 #include "stove_fsm.h"
@@ -88,9 +89,9 @@ static const char PAGE_HTML[] PROGMEM = R"rawliteral(
   <section>
     <h2>Power</h2>
     <div class="row">
-      <button data-cmd="/accendi">Turn ON</button>
-      <button class="secondary" data-cmd="/spegni">Turn OFF</button>
-      <button class="secondary" data-cmd="/stato">Refresh status</button>
+      <button data-cmd="%CMD_ON%">Turn ON</button>
+      <button class="secondary" data-cmd="%CMD_OFF%">Turn OFF</button>
+      <button class="secondary" data-cmd="%CMD_STATUS%">Refresh status</button>
     </div>
   </section>
 
@@ -240,8 +241,14 @@ static void sendJson(int status, const String &body) {
 
 static void handleRoot() {
   if (!requireAuth()) return;
+
+  String page = PAGE_HTML;
+  page.replace("%CMD_ON%", CMD_ON);
+  page.replace("%CMD_OFF%", CMD_OFF);
+  page.replace("%CMD_STATUS%", CMD_STATUS);
+
   server.sendHeader("Cache-Control", "no-store");
-  server.send_P(200, "text/html", PAGE_HTML);
+  server.send(200, "text/html", page);
 }
 
 static void handleStatus() {

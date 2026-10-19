@@ -24,7 +24,12 @@ The project uses a `secrets.h` file for sensitive credentials.
    `DEVICE_PASSWORD` protects the local web interface, its HTTP API and the firmware upload endpoint. If it is left empty, the web server does not start.
 
 ### 2. Localization
-The system supports multi-language support via `include/localization.h`. 
+The system supports multiple languages via `include/localization.h`, which defines both the Telegram messages and the command names (`CMD_ON`, `CMD_OFF`, `CMD_STATUS`).
+
+* `include/localization.h.example` contains the English defaults (`/on`, `/off`, `/status`) used in this README.
+* `include/localization.h` contains the Italian version (`/accendi`, `/spegni`, `/stato`).
+
+Copy the example to `include/localization.h` and customize it as needed. The web interface, the HTTP API and Telegram all use the command names defined in the active `localization.h`, so they always stay consistent.
 
 ### 3. Firmware Configuration
 Before flashing the ESP32, you **must** review the `include/config.h`. These parameters act as the core logic of the system and should be adjusted to match your specific hardware and stove model:
@@ -38,7 +43,7 @@ Before flashing the ESP32, you **must** review the `include/config.h`. These par
 * **HOSTNAME**: Default is `"cloesmart"`. It is sent to the router as the DHCP hostname and used by mDNS as `cloesmart.local`.
 * **WEB_PORT**: Default is `80`. Port of the local web interface and HTTP API.
 * **WEB_AUTH_USER**: Default is `"admin"`. HTTP Basic authentication user.
-* **FW_VERSION**: Firmware version shown in `/stato`, in the web UI and in the API status response.
+* **FW_VERSION**: Firmware version shown in `/status` (or the localized status command), in the web UI and in the API status response.
 
 ## 🤖 Bot Creation & Security
 
@@ -46,9 +51,9 @@ Before flashing the ESP32, you **must** review the `include/config.h`. These par
 1. Search for **@BotFather** on Telegram.
 2. Send `/newbot` and follow the instructions to get your **API Token**.
 3. Use `/setcommands` to configure the quick menu:
-   * `accendi - Turn on the stove`
-   * `spegni - Turn off the stove`
-   * `stato - Check status and timers`
+   * `on - Turn on the stove`
+   * `off - Turn off the stove`
+   * `status - Check status and timers`
    * `set_temp - Set target temperature`
    * `crono_on - Activate hourly schedule`
    * `crono_off - Deactivate hourly schedule`
@@ -89,7 +94,7 @@ Do not use third-party "ID bots". Use the official Telegram API via your browser
 The ESP32 serves a web interface and an HTTP API on port `80` (configurable with `WEB_PORT`). No Internet connection is required: as long as the local network is working, the interface is reachable.
 
 * URL: `http://<device-ip>/`
-* mDNS alias: `http://cloesmart.local/` (supported by most desktop browsers; some Android devices may not resolve `.local`, so use the IP shown in `/stato`)
+* mDNS alias: `http://cloesmart.local/` (supported by most desktop browsers; some Android devices may not resolve `.local`, so use the IP shown in `/status`)
 * DHCP hostname: `cloesmart`
 
 The web interface is protected by HTTP Basic authentication:
@@ -103,20 +108,20 @@ If `DEVICE_PASSWORD` is empty, the web server does not start (fail-closed) and a
 
 ### Supported commands
 
-The web interface exposes exactly the same commands as Telegram:
+The web interface exposes exactly the same commands as Telegram. The names below are the English defaults from `localization.h.example`; with the Italian localization they are `/accendi`, `/spegni` and `/stato`.
 
 | Command | Description |
 | :--- | :--- |
-| `/accendi` | Turn the stove ON |
-| `/spegni` | Turn the stove OFF |
-| `/stato` | Show status, schedule, time, firmware version and IP |
+| `/on` | Turn the stove ON |
+| `/off` | Turn the stove OFF |
+| `/status` | Show status, schedule, time, firmware version and IP |
 | `/crono_on` | Enable the daily schedule |
 | `/crono_off` | Disable the daily schedule |
 | `/set_on HH:MM` | Set the schedule ON time |
 | `/set_off HH:MM` | Set the schedule OFF time |
 | `/set_temp N` | Set the target temperature (10-30 °C) |
 
-All commands share the same implementation (`processCommand()`), so behaviour is identical across Telegram and HTTP.
+All commands share the same implementation (`processCommand()`), so behaviour is identical across Telegram and HTTP. The web interface buttons automatically use the command names from the active `localization.h`.
 
 ### HTTP API
 
@@ -127,7 +132,7 @@ The API accepts the same command strings:
 curl -u admin:'YOUR_PASSWORD' http://cloesmart.local/api/status
 
 # Send a command (form encoded)
-curl -u admin:'YOUR_PASSWORD' -d "cmd=/accendi" http://cloesmart.local/api/command
+curl -u admin:'YOUR_PASSWORD' -d "cmd=/on" http://cloesmart.local/api/command
 
 # Set the target temperature
 curl -u admin:'YOUR_PASSWORD' -d "cmd=/set_temp 21.5" http://cloesmart.local/api/command
@@ -135,7 +140,7 @@ curl -u admin:'YOUR_PASSWORD' -d "cmd=/set_temp 21.5" http://cloesmart.local/api
 
 `GET /api/status` returns JSON with English keys: `state`, `enabled`, `temperature_c`, `target_c`, `crono_enabled`, `crono_on`, `crono_off`, `time`, `uptime_s`, `version`, `ip`, `rssi`.
 
-`POST /api/command` accepts either a form field `cmd` or a JSON body such as `{"cmd":"/stato"}`. It returns:
+`POST /api/command` accepts either a form field `cmd` or a JSON body such as `{"cmd":"/status"}`. It returns:
 
 ```json
 {"ok":true,"response":"..."}
@@ -250,7 +255,7 @@ The device sets the DHCP hostname `cloesmart` and starts mDNS for `cloesmart.loc
 
 * `http://cloesmart.local/` works on most desktop systems and iOS. Some Android browsers do not resolve `.local` addresses reliably.
 * `http://cloesmart/` (without `.local`) works only if your router registers DHCP client names in its local DNS.
-* `http://<device-ip>/` always works; the current IP is shown in the web interface and by `/stato`.
+* `http://<device-ip>/` always works; the current IP is shown in the web interface and by `/status` (or the localized status command).
 
 ## 📄 License
 
